@@ -1,0 +1,24 @@
+#!name = 📺 BiliBili CN Enhanced Clean Balanced
+#!desc = B站中国区增强平衡版｜首页UI + 港澳台入口 + 分区增强 + 开屏/搜索净化｜去掉Mine/iPad增强以提升速度
+#!openUrl = http://boxjs.com/#/app/BiliBili.Enhanced
+#!author = VirgilClyne / Local Balanced Preset
+#!homepage = https://Enhanced.BiliUniverse.io
+#!icon = https://github.com/BiliUniverse/Enhanced/raw/main/src/assets/icon_rounded.png
+#!category = 📺 BiliBili
+#!version = 2.2.0
+#!arguments = Home.Switch:true,Home.Tab:"直播tab,推荐tab,hottopic,bangumi,anime,film,koreavtw",Home.Tab_default:"推荐tab",Home.Top_left:"mine",Home.Top:"消息Top",Bottom:"home,dynamic,ogv,会员购Bottom,我的Bottom",Region.Switch:true,Mine.Switch:true,Mine.iPad.Switch:false,Storage:"Argument",LogLevel:"ERROR"
+
+[URL Rewrite]
+^https:\/\/app\.bilibili\.com\/x\/v2\/splash\/show(?:\?.*)?$ - reject
+^https:\/\/app\.bilibili\.com\/x\/v2\/splash\/list(?:\?.*)?$ - reject
+^https:\/\/app\.bilibili\.com\/x\/v2\/splash\/event\/list2(?:\?.*)?$ - reject
+^https:\/\/app\.bilibili\.com\/x\/v2\/search\/defaultwords(?:\?.*)?$ - reject
+
+[Script]
+📺 BiliBili.Enhanced.Home = type=http-response, pattern=^https?:\/\/app\.bili(bili\.com|api\.net)\/x\/resource\/show\/tab\/v2\?, requires-body=1, timeout=6, script-path=https://github.com/BiliUniverse/Enhanced/releases/download/v0.5.13/response.bundle.js, argument=Home.Switch="{{{Home.Switch}}}"&Home.Tab="{{{Home.Tab}}}"&Home.Tab_default="{{{Home.Tab_default}}}"&Home.Top_left="{{{Home.Top_left}}}"&Home.Top="{{{Home.Top}}}"&Bottom="{{{Bottom}}}"&Region.Switch="{{{Region.Switch}}}"&Mine.Switch="{{{Mine.Switch}}}"&Mine.iPad.Switch="false"&Storage="{{{Storage}}}"&LogLevel="{{{LogLevel}}}"
+📺 BiliBili.Enhanced.Region = type=http-response, pattern=^https?:\/\/app\.bili(bili\.com|api\.net)\/x\/v2\/region\/index\?, requires-body=1, timeout=6, script-path=https://github.com/BiliUniverse/Enhanced/releases/download/v0.5.13/response.bundle.js, argument=Home.Switch="{{{Home.Switch}}}"&Home.Tab="{{{Home.Tab}}}"&Home.Tab_default="{{{Home.Tab_default}}}"&Home.Top_left="{{{Home.Top_left}}}"&Home.Top="{{{Home.Top}}}"&Bottom="{{{Bottom}}}"&Region.Switch="{{{Region.Switch}}}"&Mine.Switch="{{{Mine.Switch}}}"&Mine.iPad.Switch="false"&Storage="{{{Storage}}}"&LogLevel="{{{LogLevel}}}"
+📺 BiliBili.Enhanced.Channel = type=http-response, pattern=^https?:\/\/app\.bili(bili\.com|api\.net)\/x\/v2\/channel\/region\/list\?, requires-body=1, timeout=6, script-path=https://github.com/BiliUniverse/Enhanced/releases/download/v0.5.13/response.bundle.js, argument=Home.Switch="{{{Home.Switch}}}"&Home.Tab="{{{Home.Tab}}}"&Home.Tab_default="{{{Home.Tab_default}}}"&Home.Top_left="{{{Home.Top_left}}}"&Home.Top="{{{Home.Top}}}"&Bottom="{{{Bottom}}}"&Region.Switch="{{{Region.Switch}}}"&Mine.Switch="{{{Mine.Switch}}}"&Mine.iPad.Switch="false"&Storage="{{{Storage}}}"&LogLevel="{{{LogLevel}}}"
+📺 BiliBili.Enhanced.Mine = type=http-response, pattern=^https?:\/\/app\.bili(bili\.com|api\.net)\/x\/v2\/account\/mine\?, requires-body=1, timeout=6, script-path=https://github.com/BiliUniverse/Enhanced/releases/download/v0.5.13/response.bundle.js, argument=Home.Switch="{{{Home.Switch}}}"&Home.Tab="{{{Home.Tab}}}"&Home.Tab_default="{{{Home.Tab_default}}}"&Home.Top_left="{{{Home.Top_left}}}"&Home.Top="{{{Home.Top}}}"&Bottom="{{{Bottom}}}"&Region.Switch="{{{Region.Switch}}}"&Mine.Switch="{{{Mine.Switch}}}"&Mine.iPad.Switch="false"&Storage="{{{Storage}}}"&LogLevel="{{{LogLevel}}}"
+
+[MITM]
+hostname = %APPEND% app.bilibili.com, app.biliapi.net

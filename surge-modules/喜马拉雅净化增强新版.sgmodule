@@ -1,0 +1,41 @@
+#!name = 🎧 喜马拉雅净化增强
+#!desc = 喜马拉雅 iOS｜开屏/广告/首页推荐/UI 净化｜稳定优先
+#!author = ddgksf2013 / fmz200 规则参考 / 本地整合
+#!category = 🎧 喜马拉雅
+#!version = 2.0.0
+#!date = 2026-08-22
+
+[Rule]
+DOMAIN,ad.ximalaya.com,REJECT
+DOMAIN,adbs.ximalaya.com,REJECT
+DOMAIN,adse.ximalaya.com,REJECT
+DOMAIN,adse.wsa.ximalaya.com,REJECT
+DOMAIN,adbehavior.wsa.ximalaya.com,REJECT
+DOMAIN,adsebs.ximalaya.com,REJECT
+
+[URL Rewrite]
+^https?:\/\/(?:adse(?:\.wsa)?|adbehavior(?:\.wsa)?|adbs|adsebs|xdcs-collector)\.ximalaya\.com\/.* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/api\/v\d+\/adRealTime(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/ting\/preload(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/outadservice(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/ting\/(?:loading|feed|home)(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-feed\/focus\/queryF(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-feed\/isShowUserGiftPendant(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/social-web\/bottomTabs\/dynamicEntrance\/status(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/chaos-notice-web\/v1\/message\/preview\/list(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/mobile-user\/unread(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/(?:hub\/)?hotWord(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/(?:hub\/)?hotWordBillboard(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/(?:hub\/)?guideWord(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/butler-portal\/versionCheck(?:\/|\?|$) - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/mobile\/discovery\/v\d+\/location(?:\/|\?|$) - reject
+
+[Script]
+🎧 喜马拉雅.分类 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-category\/customCategories(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ximalaya_json.js
+🎧 喜马拉雅.轮播 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/focus-mobile\/focusPic(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ximalaya_json.js
+🎧 喜马拉雅.推荐 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-feed\/v\d+\/mix(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ximalaya_json.js
+🎧 喜马拉雅.分类页 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-category\/v\d+\/category(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ximalaya_json.js
+🎧 喜马拉雅.我的 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/mobile-user\/v\d+\/homePage(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/ddgksf2013/Scripts/refs/heads/master/ximalaya_json.js
+
+[MITM]
+hostname = %APPEND% *.ximalaya.com, *.xmcdn.com
