@@ -1,6 +1,7 @@
 import { load as parseYaml } from 'js-yaml';
 import { createApp } from './app/createApp.jsx';
 import { createCloudflareRuntime } from './runtime/cloudflare.js';
+import { handleSurgeModule, handleSurgeModuleCenter } from './surgeModules.js';
 
 let honoApp;
 
@@ -188,6 +189,14 @@ export default {
 
         if (url.pathname === '/surge-nodes') {
             return handleSurgeNodes(request);
+        }
+
+        if (url.pathname === '/surge-modules') {
+            return handleSurgeModuleCenter(request);
+        }
+
+        if (url.pathname === '/surge-module') {
+            return handleSurgeModule(request);
         }
 
         const app = getApp(env);
