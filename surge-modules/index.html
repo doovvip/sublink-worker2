@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Surge 模块安装中心</title>
+<style>
+:root{color-scheme:light dark;font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","PingFang SC",sans-serif}body{margin:0;background:#f5f5f7;color:#111}.wrap{max-width:680px;margin:auto;padding:28px 18px 48px}.card{background:#fff;border-radius:22px;padding:22px;box-shadow:0 8px 30px rgba(0,0,0,.06)}h1{font-size:28px;margin:0 0 8px}.sub{color:#666;margin:0 0 22px;line-height:1.5}.item{display:flex;align-items:center;gap:14px;border:1px solid #e5e5ea;border-radius:16px;padding:15px;margin:10px 0;cursor:pointer}.item input{width:20px;height:20px}.emoji{font-size:28px}.name{font-weight:650}.desc{font-size:13px;color:#777;margin-top:3px}.btn{width:100%;border:0;border-radius:16px;padding:15px;margin-top:18px;font-size:17px;font-weight:700;background:#0a84ff;color:white}.note{font-size:12px;color:#777;line-height:1.6;margin-top:16px}@media(prefers-color-scheme:dark){body{background:#000;color:#fff}.card{background:#1c1c1e}.item{border-color:#3a3a3c}.sub,.desc,.note{color:#aaa}}
+</style>
+</head>
+<body>
+<div class="wrap"><div class="card">
+<h1>⚡ Surge 模块安装中心</h1>
+<p class="sub">选择一个模块，然后点“安装到 Surge”。主配置、机场订阅和节点信息不在这里。</p>
+<label class="item"><input type="radio" name="m" value="bili" checked><span class="emoji">📺</span><span><div class="name">BiliBili 净化增强</div><div class="desc">首页增强、港澳台入口、开屏/搜索净化</div></span></label>
+<label class="item"><input type="radio" name="m" value="youtube"><span class="emoji">▶️</span><span><div class="name">YouTube 净化增强</div><div class="desc">去广告、PIP/后台播放支持、稳定补丁</div></span></label>
+<label class="item"><input type="radio" name="m" value="ximalaya"><span class="emoji">🎧</span><span><div class="name">喜马拉雅净化增强</div><div class="desc">开屏、广告、推荐及 UI 净化</div></span></label>
+<label class="item"><input type="radio" name="m" value="startup"><span class="emoji">🚫</span><span><div class="name">全局开屏去广告增强</div><div class="desc">Walvez 持续维护版，自动跟随上游更新</div></span></label>
+<button class="btn" onclick="installSelected()">安装到 Surge</button>
+<p class="note">需要设备已安装 Surge。首次启用涉及 HTTPS 解密的模块时，请确保 Surge CA 已安装并信任；之后更新模块通常不需要重复安装证书。</p>
+</div></div>
+<script>
+const modules={
+  bili:'https://raw.githubusercontent.com/doovvip/sublink-worker2/main/surge-modules/BiliBili_CN-V1.sgmodule',
+  youtube:'https://raw.githubusercontent.com/doovvip/sublink-worker2/main/surge-modules/YouTube净化增强.sgmodule',
+  ximalaya:'https://raw.githubusercontent.com/doovvip/sublink-worker2/main/surge-modules/喜马拉雅净化增强新版.sgmodule',
+  startup:'https://raw.githubusercontent.com/Walvez/surge-startup-ads/main/dist/StartUpAds_Selected.sgmodule'
+};
+function installSelected(){
+ const k=document.querySelector('input[name="m"]:checked').value;
+ location.href='surge:///install-module?url='+encodeURIComponent(modules[k]);
+}
+</script>
+</body>
+</html>
