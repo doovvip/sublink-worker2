@@ -5,7 +5,7 @@
 #!date=2026-08-31
 
 [Script]
-BaiduNetdisk chxm1023 = type=http-response,pattern=^https?:\/\/pan\.baidu\.com\/(act\/.+\/(activityentry|bchannel|cardwelfare|skin)|rest\/.+\/(membership\/user|pcs\/adv)|feed\/cardinfos|api\/(user\/getinfo|quota|loginstatus|account\/getprivilege)|buy\/ad\/conf|wap\/vip|coins\/taskcenter\/homensr),requires-body=true,max-size=0,script-path=https://raw.githubusercontent.com/chxm1023/Rewrite/main/bdcloud.js
+BaiduNetdisk chxm1023 = type=http-response,pattern=^https?:\/\/pan\.baidu\.com\/(act\/.+\/(activityentry|bchannel|cardwelfare|skin)|rest\/.+\/(membership\/user|pcs\/adv)|feed\/cardinfos|api\/(user\/getinfo|quota|loginstatus|account\/getprivilege)|buy\/ad\/conf|wap\/vip|coins\/taskcenter\/homensr),requires-body=true,max-size=0,script-path=https://cdn.jsdelivr.net/gh/chxm1023/Rewrite@main/bdcloud.js
 
 [MITM]
 hostname = %APPEND% pan.baidu.com
