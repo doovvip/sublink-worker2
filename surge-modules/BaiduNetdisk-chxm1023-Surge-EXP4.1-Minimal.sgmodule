@@ -1,0 +1,11 @@
+#!name=百度网盘 chxm1023｜Surge EXP-4.1 Minimal
+#!desc=最小兼容测试：仅处理 membership/user，排除 loginstatus/quota/coins/skin/wap 等接口引发 403/1008。
+#!author=chxm1023 / Surge wrapper by doovvip
+#!system=ios
+#!date=2026-08-31
+
+[Script]
+BaiduNetdisk chxm1023 Minimal = type=http-response,pattern=^https?:\/\/pan\.baidu\.com\/rest\/.+\/membership\/user,requires-body=true,max-size=0,script-path=https://raw.githubusercontent.com/chxm1023/Rewrite/main/bdcloud.js
+
+[MITM]
+hostname = %APPEND% pan.baidu.com
