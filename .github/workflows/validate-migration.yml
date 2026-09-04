@@ -5,6 +5,14 @@ on:
     branches:
       - migration/from-sublink-worker-2026-09-04
     paths:
+      - src/**
+      - api/**
+      - Module/**
+      - Script/**
+      - surge-modules/**
+      - surge-scripts/**
+      - permanent-assets/**
+      - migration-reference/**
       - .github/workflows/validate-migration.yml
 
 permissions:
@@ -30,7 +38,7 @@ jobs:
           test ! -e surge-config/Surge.conf
           test ! -e api/r2-public.js
           test ! -e api/surge-r2.js
-      - name: Unit tests
-        run: npm test
+      - name: Server unit tests
+        run: npx vitest run test
       - name: Vercel build
         run: npm run build
