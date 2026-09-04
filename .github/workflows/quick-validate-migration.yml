@@ -1,0 +1,38 @@
+name: Quick validate migration
+
+on:
+  push:
+    branches:
+      - migration/from-sublink-worker-2026-09-04
+    paths:
+      - .github/workflows/quick-validate-migration.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: migration/from-sublink-worker-2026-09-04
+      - name: Security assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RniE 'ca-p12|ca-passphrase|rlkey=' src api Module Script surge-modules surge-scripts permanent-assets migration-reference 2>/dev/null
+          test ! -e surge-config/Surge.conf
+          test ! -e api/r2-public.js
+          test ! -e api/surge-r2.js
+      - name: Syntax checks for migrated server code
+        shell: bash
+        run: |
+          set -euo pipefail
+          node --check src/tanzouSubscription.js
+          node --check src/unifiedSubscription.js
+          node --check src/taobaoPriceWeb.js
+          node --check src/surgeModules.js
+          node --check src/worker.jsx
+          node --check api/index.js
+          node --check api/all-clean.js
