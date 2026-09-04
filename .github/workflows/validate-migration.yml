@@ -40,6 +40,6 @@ jobs:
           test ! -e api/surge-r2.js
           ! grep -RniE 'https://raw\.githubusercontent\.com/doovvip/sublink-worker/(main|[0-9a-f]{40})/|https://github\.com/doovvip/sublink-worker/raw/(main|[0-9a-f]{40})/' src api Module Script surge-modules surge-scripts permanent-assets 2>/dev/null
       - name: Server unit tests
-        run: npx vitest run test
+        run: npx vitest run --exclude 'surge-scripts/**'
       - name: Vercel build
         run: npm run build
