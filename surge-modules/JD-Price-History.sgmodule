@@ -1,0 +1,15 @@
+#!name=京东历史比价
+#!desc=Surge版｜适配 Surge-1.0｜自托管脚本｜增强慢慢买 CK 抓取
+#!author=wf021325 / doovvip Surge adaptation
+#!category=京东
+#!system=ios
+#!version=1.0.2
+#!date=2026-08-28
+
+[Script]
+京东历史比价 = type=http-response, pattern=^https?:\/\/in\.m\.jd\.com\/product\/graphext\/\d+\.html(?:\?.*)?$, requires-body=true, max-size=-1, timeout=60, script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/jd_price.surge.js, script-update-interval=86400
+
+慢慢买CK增强抓取 = type=http-request, pattern=^https?:\/\/(?:[^\/]+\.)?manmanbuy\.com\/, requires-body=true, max-size=-1, timeout=20, script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/jd_price.surge.js, script-update-interval=86400
+
+[MITM]
+hostname = %APPEND% in.m.jd.com, *.manmanbuy.com

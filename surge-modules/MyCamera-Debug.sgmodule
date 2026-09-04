@@ -1,0 +1,10 @@
+#!name=我的相机｜Surge 调试版
+#!desc=仅调试 api.account.meitu.com｜远程 JS｜不修改响应
+#!author=Alex0510
+#!category=Script
+
+[Script]
+我的相机账号响应调试 = type=http-response,pattern=^https:\/\/api\.account\.meitu\.com\/.*$,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/f9802e6053ec66a414d08f9b5e9f0a8584af6f90/surge-scripts/mycamera.debug.js
+
+[MITM]
+hostname = %APPEND% api.account.meitu.com

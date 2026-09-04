@@ -1,0 +1,10 @@
+#!name=我的相机 - Surge 原生兼容
+#!desc=完整保留 Eric 原 myCamera.js 逻辑，仅增加 Surge 运行环境兼容；3天更新
+#!author=Eric
+#!category=Script
+
+[Script]
+我的相机 = type=http-response,pattern=^https:\/\/(?:[^\/]+\.)?(?:meiyan|meitu)\.com\/.*,requires-body=true,max-size=-1,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/main/Script/myCamera-Surge.js,script-update-interval=259200
+
+[MITM]
+hostname = %APPEND% meiyan.com, *.meiyan.com, meitu.com, *.meitu.com

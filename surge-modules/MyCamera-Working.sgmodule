@@ -1,0 +1,14 @@
+#!name=我的相机｜Surge 可运行版
+#!desc=已按实机域名配置｜远程 JS｜只记录不改响应
+#!author=doovvip
+#!category=Script
+#!system=iOS
+#!version=1.0.0
+#!date=2026-09-03
+
+[Script]
+MyCamera-Meiyan = type=http-response,pattern=^https?:\/\/api\.meiyan\.com\/.*$,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/07dc4feae339e02a3cfe48449512fffce5ba6d1e/surge-scripts/mycamera.working.js,script-update-interval=86400
+MyCamera-Account = type=http-response,pattern=^https?:\/\/api\.account\.meitu\.com\/.*$,requires-body=1,max-size=0,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/07dc4feae339e02a3cfe48449512fffce5ba6d1e/surge-scripts/mycamera.working.js,script-update-interval=86400
+
+[MITM]
+hostname = %APPEND% api.meiyan.com, api.account.meitu.com

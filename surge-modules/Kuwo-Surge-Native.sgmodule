@@ -1,0 +1,78 @@
+#!name=酷我音乐会员解锁
+#!desc=酷我母版｜Surge 原生稳定基线｜已实机跑通：VIP、播放、缓存、广告净化、开屏广告正常
+#!system=ios
+#!author=ddgksf2013 / Surge 原生适配
+#!category=酷我音乐
+
+# ============================================================
+# 酷我母版 / 正式基线
+# ============================================================
+# 本文件为“酷我母版”，也是后续唯一正式基线。
+# 已由用户实机确认跑通：
+# - VIP 状态
+# - 会员/普通歌曲播放
+# - 缓存/下载
+# - 广告净化
+# - 开屏广告
+#
+# 母版规则：
+# 1. 后续所有优化版、实验版、兼容版均从本文件派生。
+# 2. 未经实机验证的修改，不允许反向覆盖母版。
+# 3. 不重新引入 Quantumult X 模拟层。
+# 4. 不随意删减 16 条 Map Local、14 个脚本入口与现有 MITM 范围。
+# 5. 开屏兼容必须保留 pasterAdvert / pasterAdvert/config / startup/config。
+# 6. WebView 引擎保持不变，除非单独实验并实机验证。
+# ============================================================
+
+# ============================================================
+# 设计思路
+# ============================================================
+# 1. 原生优先：直接使用 Surge API，不模拟 Quantumult X，不注入 $task / $prefs / $notify。
+# 2. 功能优先：以已实机跑通的 VIP、会员歌曲播放、缓存、广告净化为正式功能基线。
+# 3. 最小改动：保留原酷我业务处理逻辑，只重写运行环境与响应兼容层。
+# 4. 分层处理：Map Local 负责静态广告/弹窗拦截；Script 负责 VIP、播放授权、缓存与动态接口处理。
+# 5. 响应一致：统一补齐 body / status / statusCode / headers，避免播放与缓存链路因运行环境差异失效。
+# 6. 引擎稳定：继续使用 Surge WebView 引擎；不为“更原生”贸然切换 JSC，避免增加变量。
+# 7. 规则完整：正式原版保留 16 条 Map Local、14 个脚本入口及当前 MITM 范围，不做激进精简。
+# 8. 版本原则：本文件即“酷我原版”；以后任何优化、实验版都从本文件派生，不反向覆盖原版。
+# 9. 业务来源：原始酷我逻辑来自 ddgksf2013 的 kkmusic.vip.js；本版仅做 Surge 原生适配与稳定性修正。
+# ============================================================
+
+
+[Map Local]
+# 酷我开屏：兼容新版 pasterAdvert / startup config
+^https?:\/\/.*kuwo\.cn\/star\/upload\/95\/25\/1764662243747_\.png data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/star\/upload\/25\/9\/1763524573099_\.png data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/openapi\/v\d+\/operate\/text data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/openapi\/v\d+\/operate\/downTab\/info data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/apps\/global-free-popup data-type=text data=" " status-code=200
+^https?:\/\/vip1\.kuwo\.cn\/vip\/activity\/kwMemberDay data-type=text data=" " status-code=200
+^https?:\/\/mc\.tencentmusic\.com\/sdk\/ad data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/AdSystem data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/openapi\/v1\/user\/freemium\/global\/text data-type=text data=" " status-code=200
+^https?:\/\/hotword\.kuwo\.cn\/hotword\.s data-type=text data=" " status-code=200
+^https?:\/\/vip1\.kuwo\.cn\/vip_adv\/ data-type=text data=" " status-code=200
+^https?:\/\/vip1\.kuwo\.cn\/vip\/v\d+\/sysinfo data-type=text data=" " status-code=200
+^https?:\/\/wapi\.kuwo\.cn\/openapi\/v\d+\/app\/(?:pasterAdvert(?:\/config)?|startup\/config) data-type=text data=" " status-code=200
+^https?:\/\/mobilead\.kuwo\.cn\/ data-type=text data=" " status-code=200
+^https?:\/\/.*kuwo\.cn\/star\/upload\/64\/73\/1724231349487_\.M data-type=text data=" " status-code=200
+^https?:\/\/rich\.kuwo\.cn\/AdService data-type=text data=" " status-code=200
+
+[Script]
+kkmusic.vip.01 = type=http-response,pattern=^https?:\/\/searchrecterm\.kuwo\.cn\/recterm\.s,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.02 = type=http-response,pattern=^https?:\/\/appi\.kuwo\.cn\/kuwopay\/vip-tab\/page\/cells,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.03 = type=http-response,pattern=^https?:\/\/appi\.kuwo\.cn\/kuwopay\/vip-tab\/setting,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.04 = type=http-response,pattern=^https?:\/\/musicpay\.kuwo\.cn\/music\.pay\?newver,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.05 = type=http-response,pattern=^https?:\/\/[a-z0-9A-Z]+\.(kuwo|lrts)\.(cn|me)\/a\.p,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.06 = type=http-response,pattern=^https?:\/\/[a-z0-9A-Z]+\.kuwo\.cn\/audi\.tion,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.07 = type=http-response,pattern=^https?:\/\/.*\.kuwo\.cn\/v2\/api\/pay\/vip\/extraVipStatus,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.08 = type=http-response,pattern=^https?:\/\/vip1\.kuwo\.cn\/vip\/enc\/user\/vip\?op=ui,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.09 = type=http-response,pattern=^https?:\/\/vip1\.kuwo\.cn\/vip\/v2\/userbase\/vip\?op=get,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.10 = type=http-response,pattern=^https?:\/\/vip1\.kuwo\.cn\/vip\/v2\/user\/vip\?(uid|op=ui),requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.11 = type=http-response,pattern=^https?:\/\/vip1\.kuwo\.cn\/vip\/v2\/theme,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.12 = type=http-request,pattern=^https?:\/\/musicpay\.kuwo\.cn\/music\.pay\?ui,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.13 = type=http-response,pattern=^https?:\/\/appi\.kuwo\.cn\/kuwopay\/personal\/cells,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+kkmusic.vip.14 = type=http-response,pattern=^https?:\/\/[a-z0-9A-Z]+\.kuwo\.cn\/mobi\.s\?f=kwxs,requires-body=true,max-size=-1,timeout=60,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js
+
+[MITM]
+hostname = %APPEND% *.kuwo.cn, *.lrts.me, mc.tencentmusic.com

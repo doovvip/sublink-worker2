@@ -1,0 +1,169 @@
+#!name=哔哩哔哩去广告
+#!desc=哔哩哔哩正式母版｜普通版 + HD/iPad 开屏已实机跑通｜完整入口、UI 净化、推荐/直播/搜索/动态/Proto 去广告正常
+#!author=ddgksf2013, BiliUniverse / Surge native optimization
+#!category=去广告
+#!arguments=Home.Switch:true,Home.Tab:"直播tab,推荐tab,hottopic,bangumi,anime,film,koreavtw",Home.Tab_default:"推荐tab",Home.Top_left:"mine",Home.Top:"消息Top",Bottom:"home,dynamic,ogv,会员购Bottom,我的Bottom",Region.Switch:true,Mine.Switch:true,Mine.iPad.Switch:true,Storage:"Argument",LogLevel:"WARN"
+#!system=ios
+
+# ============================================================
+# 哔哩哔哩母版 / 正式基线
+# ============================================================
+# 当前文件定位：
+# - 本文件为“哔哩哔哩母版”，也是后续唯一正式基线。
+# - 已由用户实机确认跑通。
+# - 后续所有优化版、实验版、兼容版均从本文件派生。
+# - 未经实机验证的修改，不允许反向覆盖母版。
+#
+# 当前已确认功能：
+# - 开屏广告净化（普通版 + HD/iPad，已实机验证）
+# - 首页推荐流净化
+# - 直播页广告/购物浮层净化
+# - 追番/观影页面净化
+# - 搜索默认词与搜索广告处理
+# - 动态、UP 推荐、弹幕、青少年相关 Proto 净化
+# - 完整首页入口与 UI 净化
+# - 港澳台 / 动画 / 韩综 / 节目入口
+# - Mine / Region / Channel 页面处理
+#
+# ============================================================
+# 设计逻辑
+# ============================================================
+# 1. Surge 原生优先
+#    - 不再按 Quantumult X 的“一接口一脚本行”方式机械移植。
+#    - 不模拟 QX 运行环境，不引入 $task / $prefs / $notify 兼容层。
+#    - 墨鱼 bilibili.ads.js 仅依赖 $request / $response / $done，可直接由 Surge 执行。
+#
+# 2. 功能优先
+#    - 优先保证“完整入口 + UI 净化 + 去广告”全部正常。
+#    - 不为了追求极限精简而删除已经跑通的功能路径。
+#    - B 站模块与酷我、通用去开屏模块保持独立，避免互相覆盖。
+#
+# 3. 少入口、少重复
+#    - 墨鱼 JSON 接口合并为单一 BiliBili.JSON 入口。
+#    - Enhanced 的 Tab / Mine / Region / Channel 合并为单一 BiliBili.Enhanced 入口。
+#    - Proto/gRPC 的搜索 / 弹幕 / 青少年 / UP 推荐 / 动态合并为单一 BiliBili.Proto 入口。
+#    - 目的是减少 Surge 脚本调度次数与重复匹配，降低维护复杂度。
+#
+# 4. 职责分层
+#    - URL Rewrite：处理可直接拒绝的广告/默认词接口；HD/iPad 开屏使用成功响应净化，避免触发本地缓存兜底。
+#    - JSON Script：处理需要读取并修改 JSON 响应的接口。
+#    - Enhanced：负责首页入口、底栏、Mine、Region、Channel 与 UI 结构。
+#    - Proto：只处理 protobuf/gRPC 二进制接口。
+#
+# ============================================================
+# 设置规则
+# ============================================================
+# 1. 模块名称固定为“哔哩哔哩去广告”。
+# 2. Home.Tab / Bottom / Region / Mine 参数为母版 UI 参数，不随意修改。
+# 3. /x/resource/show/tab/v2 只交给 BiliUniverse Enhanced 处理。
+# 4. Mine 页面只交给 Enhanced 处理，避免与墨鱼 Mine 逻辑重复改写。
+# 5. 旧版 /x/resource/show/tab 仅作为兼容回退，由墨鱼 JSON 逻辑处理。
+# 6. Proto 接口必须保留 binary-body-mode=true。
+# 7. requires-body=true 仅用于需要读取响应体的脚本。
+# 8. max-size=-1 仅保留在确有完整响应体需求的入口。
+# 9. timeout 维持当前实测稳定值；没有日志依据不随意缩短。
+# 10. 不在本模块中加入通用开屏、酷我、喜马拉雅等其它 App 规则。
+#
+# ============================================================
+# 优化原则
+# ============================================================
+# 1. 速度优先于“极限精简”。
+# 2. 能用 URL Rewrite 直接拒绝的，不额外挂脚本；HD/iPad 开屏为实机验证例外，保留成功响应净化。
+# 3. 相同脚本、相同处理类型的接口尽量合并为单一正则入口。
+# 4. 不重复执行同一业务逻辑，避免双脚本修改同一响应。
+# 5. 不添加 debug=true，不保留无意义测试规则。
+# 6. 不主动升级外部脚本版本；只有当前版本失效或实际功能异常时再升级。
+# 7. 外部脚本若失效，优先镜像到 doovvip/sublink-worker 再替换路径，避免再次出现 404。
+# 8. 优化必须以“功能不回退”为前提；任何减法都需要实机验证。
+#
+# ============================================================
+# MITM 兼容策略
+# ============================================================
+# 1. MITM 只保留本模块实际处理到的主机。
+# 2. 不使用过宽的 *.bilibili.* / *.biliapi.*，减少无关 HTTPS 解密。
+# 3. 当前主机范围覆盖：
+#    - app.bilibili.com
+#    - app.biliapi.net
+#    - api.bilibili.com
+#    - api.bilibili.net
+#    - api.biliapi.com
+#    - api.biliapi.net
+#    - api.live.bilibili.com
+#    - manga.bilibili.com
+#    - grpc.biliapi.net
+# 4. 若未来新增接口，先确认实际 host，再最小追加，不扩大整域通配。
+#
+# ============================================================
+# 兼容与冲突规则
+# ============================================================
+# 1. 同一时间只启用一个 B 站专用模块。
+# 2. 不与旧版 BiliBiliAds / 精简版 / 完整整合版同时启用。
+# 3. 通用 StartUpAds 不再接管 B 站接口，避免与本模块重叠。
+# 4. 本模块不要求重新安装 MITM 证书；使用现有已受信任证书即可。
+# 5. 如果 UI 入口异常：
+#    - 先检查 Enhanced 入口是否命中；
+#    - 再检查 Bilibili App 缓存；
+#    - 最后才考虑脚本版本问题。
+# 6. 如果广告净化异常：
+#    - 先看 URL Rewrite / JSON / Proto 哪一层未命中；
+#    - 不先扩大 MITM，也不先加大范围通配。
+#
+# ============================================================
+# 维护与回滚规则
+# ============================================================
+# 1. 本文件即“哔哩哔哩母版”。
+# 2. 修改前先复制为实验版，不能直接在母版上试错。
+# 3. 新版必须经过：
+#    - 模块可加载
+#    - 外部资源无 404
+#    - 首页入口正常
+#    - UI 净化正常
+#    - 开屏正常
+#    - 推荐/直播/搜索/动态正常
+#    - Proto 功能正常
+#    才能考虑晋升为新母版。
+# 4. 若任一核心功能回退，立即回滚本母版。
+# 5. 不因“看起来更干净”而删除尚未确认无用的规则。
+# 6. 任何外部脚本地址变更，都应优先保证可持续访问与可回滚。
+#
+# ============================================================
+# 当前母版策略摘要
+# ============================================================
+# 主线路：Surge 原生结构
+# JSON：墨鱼 bilibili.ads.js + HD/iPad 开屏成功响应净化脚本
+# UI：BiliUniverse Enhanced
+# Proto：BiliUniverse ADBlock
+# 目标：少入口、少重复、少 MITM、功能完整、可回滚
+# ============================================================
+
+[URL Rewrite]
+# 播放页广告接口
+^https?:\/\/api\.bilibili\.com\/pgc\/activity\/deliver\/material\/receive - reject-dict
+^https?:\/\/api\.bilibili\.com\/x\/vip\/ads\/material\/report - reject-dict
+^https:\/\/api\.bilibili\.com\/pgc\/season\/player\/cards - reject-dict
+^https?:\/\/api\.bilibili\.com\/pgc\/season\/player\/ogv\/cards - reject-dict
+
+# 开屏｜HD/iPad 实机验证：4 个 splash 接口改由成功响应脚本净化，避免 reject 触发本地缓存兜底
+
+# 漫画
+^https?:\/\/manga\.bilibili\.com\/twirp\/comic\.v\d\.Comic\/(Flash|ListFlash|GetActivityTab) - reject-dict
+
+# 搜索默认推广词 / Proto DefaultWord
+^https?:\/\/app\.bili(?:bili\.com|api\.net)\/x\/v\d+\/search\/defaultwords(?:\?.*)?$ - reject
+^https?:\/\/(app\.bilibili\.com|grpc\.biliapi\.net)\/bilibili\.app\.interface\.v1\.Search\/Default - reject-200
+
+[Script]
+# B站 HD/iPad 开屏：4 个 splash 接口统一成功响应净化
+BiliBili.HD.Splash = type=http-response, pattern=^https?:\/\/app\.bili(?:bili\.com|api\.net)\/x\/v2\/splash\/(?:show|list|event\/list2|brand\/list)(?:\?.*)?$, requires-body=true, max-size=-1, timeout=8, script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/bilibili.hd-splash.js, script-update-interval=86400
+
+# 墨鱼 JSON：播放页 / 直播 / 画质状态 / 推荐 / 追番 / 观影 / 顶部活动 / 热搜 / 旧 Tab 回退
+BiliBili.JSON = type=http-response, pattern=^(?:https?:\/\/api\.(?:biliapi|bilibili)\.(?:net|com)\/pgc\/season\/app\/related\/recommend\?|https?:\/\/api\.live\.bilibili\.com\/xlive\/(?:e-commerce-interface\/v\d\/ecommerce-user\/get_shopping_info\?|app-room\/v1\/index\/getInfoByRoom|app-interface\/v2\/index\/feed)|https?:\/\/app\.bilibili\.com\/x\/(?:v2\/(?:account\/myinfo\?|feed\/index|search\/square)|resource\/top\/activity|resource\/show\/tab(?:\?.*)?$)|https?:\/\/api\.(?:bilibili|biliapi)\.(?:com|net)\/pgc\/page\/(?:bangumi|cinema\/tab\?)), requires-body=true, max-size=-1, timeout=20, script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/b3612e647c70e05ebff57d818c2bd30d5c28c51e/permanent-assets/r2-2026-09-03/scripts/bilibili.ads.js, script-update-interval=86400
+
+# BiliUniverse Enhanced：完整首页 / Mine / Region / Channel
+BiliBili.Enhanced = type=http-response, pattern=^https?:\/\/app\.bili(?:bili\.com|api\.net)\/x\/(?:resource\/show\/tab\/v2|v2\/account\/mine(?:\/ipad)?|v2\/region\/index|v2\/channel\/region\/list)(?:\?.*)?$, requires-body=true, max-size=-1, timeout=15, script-path=https://github.com/Biliverse/Enhanced/releases/download/v0.5.13/response.bundle.js, script-update-interval=86400, argument=Home.Switch="{{{Home.Switch}}}"&Home.Tab="{{{Home.Tab}}}"&Home.Tab_default="{{{Home.Tab_default}}}"&Home.Top_left="{{{Home.Top_left}}}"&Home.Top="{{{Home.Top}}}"&Bottom="{{{Bottom}}}"&Region.Switch="{{{Region.Switch}}}"&Mine.Switch="{{{Mine.Switch}}}"&Mine.iPad.Switch="{{{Mine.iPad.Switch}}}"&Storage="{{{Storage}}}"&LogLevel="{{{LogLevel}}}"
+
+# BiliUniverse ADBlock Proto：搜索 / 弹幕 / 青少年 / UP 推荐 / 动态
+BiliBili.Proto = type=http-response, pattern=^https?:\/\/(?:grpc\.biliapi\.net|app\.bilibili\.com)\/(?:bilibili\.polymer\.app\.search\.v1\.Search\/SearchAll|bilibili\.community\.service\.dm\.v1\.DM\/(?:DmView|DmSegMobile)|bilibili\.app\.interface\.v1\.Teenagers\/ModeStatus|bilibili\.app\.(?:view|viewunite)\.v1\.View\/(?:View|TFInfo)|bilibili\.app\.dynamic\.v2\.Dynamic\/Dyn(?:All|Video))$, requires-body=true, binary-body-mode=true, max-size=-1, timeout=20, script-path=https://github.com/Biliverse/ADBlock/releases/download/v0.6.19/response.bundle.js, script-update-interval=86400
+
+[MITM]
+hostname = %APPEND% app.bilibili.com, app.biliapi.net, api.bilibili.com, api.bilibili.net, api.biliapi.com, api.biliapi.net, api.live.bilibili.com, manga.bilibili.com, grpc.biliapi.net
