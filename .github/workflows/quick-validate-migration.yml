@@ -37,6 +37,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          # Validate the current post-migration server entry points without deploying them.
           node --check src/tanzouSubscription.js
           node --check src/unifiedSubscription.js
           node --check src/surgeModules.js
