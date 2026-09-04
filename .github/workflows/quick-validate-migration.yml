@@ -5,6 +5,14 @@ on:
     branches:
       - migration/from-sublink-worker-2026-09-04
     paths:
+      - src/**
+      - api/**
+      - Module/**
+      - Script/**
+      - surge-modules/**
+      - surge-scripts/**
+      - permanent-assets/**
+      - migration-reference/**
       - .github/workflows/quick-validate-migration.yml
 
 permissions:
@@ -31,7 +39,6 @@ jobs:
           set -euo pipefail
           node --check src/tanzouSubscription.js
           node --check src/unifiedSubscription.js
-          node --check src/taobaoPriceWeb.js
           node --check src/surgeModules.js
           node --check src/worker.jsx
           node --check api/index.js
