@@ -41,6 +41,7 @@ jobs:
           node --check src/tanzouSubscription.js
           node --check src/unifiedSubscription.js
           node --check src/surgeModules.js
-          node --check src/worker.jsx
+          cp src/worker.jsx /tmp/worker.mjs
+          node --check /tmp/worker.mjs
           node --check api/index.js
           node --check api/all-clean.js
