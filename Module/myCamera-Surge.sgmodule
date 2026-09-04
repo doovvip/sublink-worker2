@@ -4,7 +4,7 @@
 #!category=Script
 
 [Script]
-我的相机 = type=http-response,pattern=^https:\/\/(?:[^\/]+\.)?(?:meiyan|meitu)\.com\/.*,requires-body=true,max-size=-1,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker/main/Script/myCamera-Surge.js,script-update-interval=259200
+我的相机 = type=http-response,pattern=^https:\/\/(?:[^\/]+\.)?(?:meiyan|meitu)\.com\/.*,requires-body=true,max-size=-1,engine=webview,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/Script/myCamera-Surge.js,script-update-interval=259200
 
 [MITM]
 hostname = %APPEND% meiyan.com, *.meiyan.com, meitu.com, *.meitu.com
