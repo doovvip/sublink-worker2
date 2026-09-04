@@ -2,7 +2,6 @@ import { load as parseYaml } from 'js-yaml';
 import { createApp } from './app/createApp.jsx';
 import { createCloudflareRuntime } from './runtime/cloudflare.js';
 import { handleSurgeModule, handleSurgeModuleCenter } from './surgeModules.js';
-import { handleTaobaoPricePage } from './taobaoPriceWeb.js';
 
 let honoApp;
 
@@ -33,7 +32,6 @@ export default {
     async fetch(request, env, ctx) {
         const url = new URL(request.url);
         if (url.pathname === '/health') return new Response('OK',{status:200,headers:{'Content-Type':'text/plain; charset=utf-8','Cache-Control':'no-store'}});
-        if (url.pathname === '/taobao-price' || url.pathname === '/api/taobao-price') return handleTaobaoPricePage(request);
         if (url.pathname === '/surge-nodes') return handleSurgeNodes(request);
         if (url.pathname === '/surge-modules') return handleSurgeModuleCenter(request);
         if (url.pathname === '/surge-module') return handleSurgeModule(request);

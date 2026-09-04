@@ -1,11 +1,9 @@
-// Taobao price web endpoint build trigger 2026-08-29 00:38
 import { createRequire } from 'module';
 import { Readable } from 'stream';
 import { createVercelRuntime } from '../src/runtime/vercel.js';
 import { handleSurgeModule, handleSurgeModuleCenter } from '../src/surgeModules.js';
 import { handleTanzouSubscription } from '../src/tanzouSubscription.js';
 import { handleUnifiedSubscription } from '../src/unifiedSubscription.js';
-import { handleTaobaoPricePage } from '../src/taobaoPriceWeb.js';
 import 'hono/jsx/jsx-runtime';
 
 const runtime = createVercelRuntime(process.env);
@@ -54,8 +52,6 @@ export default async function handler(req, res) {
                     'Cache-Control': 'no-store'
                 }
             });
-        } else if (url.pathname === '/taobao-price' || url.pathname === '/api/taobao-price') {
-            response = await handleTaobaoPricePage(request);
         } else if (url.pathname === '/surge-modules') {
             response = handleSurgeModuleCenter(request);
         } else if (url.pathname === '/surge-module') {
