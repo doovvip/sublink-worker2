@@ -1,0 +1,36 @@
+name: Validate legacy migration
+
+on:
+  push:
+    branches:
+      - migration/from-sublink-worker-2026-09-04
+    paths:
+      - .github/workflows/validate-migration.yml
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: migration/from-sublink-worker-2026-09-04
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - name: Security assertions
+        shell: bash
+        run: |
+          set -euo pipefail
+          ! grep -RniE 'ca-p12|ca-passphrase|rlkey=' src api Module Script surge-modules surge-scripts permanent-assets migration-reference 2>/dev/null
+          test ! -e surge-config/Surge.conf
+          test ! -e api/r2-public.js
+          test ! -e api/surge-r2.js
+      - name: Unit tests
+        run: npm test
+      - name: Vercel build
+        run: npm run build
