@@ -1,0 +1,13 @@
+#!name=美图秀秀 (Meitu)
+#!desc=美图秀秀/美图系列｜使用冻结脚本
+#!category=解锁
+#!system=iOS
+#!version=1.0.0
+#!date=2026-08-31
+
+[Script]
+# 美图秀秀 / 美图系列响应重写
+Meitu_Unlock = type=http-response,pattern=^https?:\/\/.*\.meitu\.com\/.*(subs_offer_elg|vip|user),requires-body=true,max-size=0,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/permanent-assets/r2-2026-09-03/scripts/meitu-frozen.js, script-update-interval=86400
+
+[MITM]
+hostname = %APPEND% *.meitu.com, api.xiuxiu.meitu.com

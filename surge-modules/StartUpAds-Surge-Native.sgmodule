@@ -1,0 +1,190 @@
+#!name=去开屏广告｜V2.0.0
+#!desc=Surge 原生正式母版｜通用开屏广告 + 喜马拉雅 + 百度网盘开屏已实机跑通｜保留正常业务与音频封面
+#!author=doovvip integration
+#!category=去广告
+#!system=ios
+#!version=2.0.0
+#!date=2026-08-30
+
+# ============================================================
+# 母版状态
+# ============================================================
+# 当前正式母版。
+# 百度网盘开屏修复已实机确认有效并合并：广告配置/素材入口 + 实机抓到的广告/点击链路域名。
+# 保留原通用开屏广告稳定规则。
+# 已合并“喜马拉雅去广告”实机跑通逻辑（V12 -> 正式版 1.0.0）：
+# - pns/startUp
+# - linkeye-cloud/checkIP 域名与直连 IP 绕过
+# - GSLB 绕过
+# - 腾讯 / 穿山甲广告 SDK
+# - 喜马拉雅广告接口、Banner 与页面 JSON 净化
+# - 保留 imagev2 / xmcdn 正常封面与音频
+# 喜马拉雅已并入本母版，启用本模块时无需再重复启用独立喜马拉雅模块。
+# ============================================================
+
+# ============================================================
+# 设计思路
+# ============================================================
+# 1. 本模块负责通用开屏/弹窗广告，并内置已实机跑通的喜马拉雅去广告；不接管 B站、酷我。
+# 2. 不模拟 Quantumult X，不使用 $task / $prefs / $notify；仅喜马拉雅页面净化使用自托管响应脚本。
+# 3. 能用 Surge 原生 URL Rewrite 直接拒绝的，直接拒绝。
+# 4. 只有必须返回固定 JSON 的接口才使用 Map Local。
+# 5. 同域、同返回方式、同业务含义的规则做小范围合并；不使用巨大正则。
+# 6. 除喜马拉雅实机跑通所需的广告 SDK、GSLB 与直连 IP MITM 外，不碰登录/支付/账号等核心业务接口。
+# 7. 当前文件即正式母版；后续新增规则继续以本文件为唯一基线。
+#
+# 当前结构：
+# - 通用开屏规则：保留已验证稳定逻辑
+# - 喜马拉雅：合并已实机跑通的正式母版
+# - QX 兼容层：0
+# - B站 / 酷我：继续由独立模块处理
+# ============================================================
+
+[Rule]
+# ===== 百度网盘：实机抓到的广告/点击链路 =====
+DOMAIN,mobads-logs.baidu.com,REJECT,pre-matching
+DOMAIN,nsclick.baidu.com,REJECT,pre-matching
+DOMAIN,als.baidu.com,REJECT,pre-matching
+DOMAIN,wn.pos.baidu.com,REJECT,pre-matching
+
+# ===== 美图秀秀：专属广告域名 =====
+DOMAIN-SUFFIX,corp.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,gg.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,message.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,tuiguang.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,xiuxiu.android.dl.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,adui.tg.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,rabbit.tg.meitu.com,REJECT,pre-matching
+DOMAIN-SUFFIX,meitubeauty.meitudata.com,REJECT,pre-matching
+DOMAIN-SUFFIX,xiuxiu.mobile.meitudata.com,REJECT,pre-matching
+DOMAIN-SUFFIX,dc.meitustat.com,REJECT,pre-matching
+DOMAIN-SUFFIX,mdc.meitustat.com,REJECT,pre-matching
+DOMAIN-SUFFIX,rabbit.meitustat.com,REJECT,pre-matching
+
+# ===== 喜马拉雅：GSLB / 广告 SDK =====
+DOMAIN,gslbali.ximalaya.com,REJECT,pre-matching
+DOMAIN,gslbtx.ximalaya.com,REJECT,pre-matching
+
+# 腾讯广告 SDK
+DOMAIN,sdk.e.qq.com,REJECT,pre-matching
+DOMAIN,tangram.e.qq.com,REJECT,pre-matching
+DOMAIN,adsmind.gdtimg.com,REJECT,pre-matching
+DOMAIN,v2mi.gdt.qq.com,REJECT,pre-matching
+DOMAIN,v3.gdt.qq.com,REJECT,pre-matching
+DOMAIN,c3.gdt.qq.com,REJECT,pre-matching
+DOMAIN,sdkquic.e.qq.com,REJECT,pre-matching
+
+# 穿山甲 / Pangle
+DOMAIN,api-access.pangolin-sdk-toutiao.com,REJECT,pre-matching
+DOMAIN,api-access.pangolin-sdk-toutiao-b.com,REJECT,pre-matching
+DOMAIN,api-access.pangolin-sdk-toutiao1.com,REJECT,pre-matching
+DOMAIN,log-api.pangolin-sdk-toutiao.com,REJECT,pre-matching
+DOMAIN,log-api.pangolin-sdk-toutiao-b.com,REJECT,pre-matching
+DOMAIN,v26-be-pack.pglstatp-toutiao.com,REJECT,pre-matching
+
+[URL Rewrite]
+# ===== 百度网盘 =====
+^https?:\/\/pan\.baidu\.com\/(?:act\/v\d+\/welfare\/list|rest\/2\.0\/pcs\/ad) - reject-200
+^https?:\/\/pan\.baidu\.com\/rest\/.+\/pcs\/adx(?:\?|$) - reject-200
+^https?:\/\/pan\.baidu\.com\/rest\/2\.0\/pcs\/adv(?:\?|$) - reject-200
+^https?:\/\/pan\.baidu\.com\/pmall\/order\/privilege\/info(?:\?|$) - reject-200
+^https?:\/\/pan\.baidu\.com\/api\/useractivity\/activity(?:\?|$) - reject-200
+^https?:\/\/pan\.baidu\.com\/act\/.+\/bchannel\/list(?:\?|$) - reject-200
+^https?:\/\/pan\.baidu\.com\/component\/view\/(?:1510|1130)\?(?:.*&)?(?:vip|from)(?:=|&|$).* - reject-200
+^https?:\/\/issuecdn\.baidupcs\.com\/issue\/netdisk\/(?:guanggao|ts_ad)(?:\/|\?|$).* - reject-200
+^https?:\/\/ndstatic\.cdn\.bcebos\.com\/activity\/welfare\/(?:js\/.+\.js|index\.html)(?:\?.*)?$ - reject-200
+^https?:\/\/staticsns\.cdn\.bcebos\.com\/amis\/.+\/banner\.png(?:\?.*)?$ - reject-200
+
+# 百度网盘：补充开屏/广告链路
+^https?:\/\/pan\.baidu\.com\/api\/certuser\/get(?:\?|$) - reject-200
+^https?:\/\/update\.pan\.baidu\.com\/statistics(?:\?|$) - reject-200
+^https?:\/\/fc-video\.cdn\.bcebos\.com(?:\/|\?|$).* - reject
+^https?:\/\/rp\.hpplay\.cn\/logouts(?:\/|\?|$).* - reject
+
+# ===== 美图秀秀：开屏 =====
+^https?:\/\/mea\.meitudata\.com\/kaiping(?:\/|\?|$).* - reject
+
+# ===== 山姆会员商店 =====
+^https?:\/\/api-sams\.walmartmobile\.cn\/api\/v1\/sams\/sams-user\/(?:window\/getGoUpPlus|screen_promotion\/get) - reject-200
+
+# ===== 淘宝 =====
+^https?:\/\/guide-acs\.m\.taobao\.com\/gw\/mtop\.taobao\.wireless\.home\.splash\.awesome\.get - reject-200
+
+# ===== 京东 =====
+^https?:\/\/api\.m\.jd\.com\/client\.action\?functionId=(?:start|queryMaterialAdverts) - reject-200
+^https?:\/\/(?:bdsp-x|dsp-x)\.jd\.com\/adx\/ - reject-200
+
+# ===== 美团 =====
+^https?:\/\/peisongapi\.meituan\.com\/client\/getInitiateImage - reject-200
+^https?:\/\/img\.meituan\.net\/(?:adunion|display|midas)\/\w+\.(?:gif|jpg|jpg\.webp)$ - reject-200
+^https?:\/\/(?:s3plus|flowplus)\.meituan\.net\/v\d+\/\w+\/linglong\/\w+\.(?:gif|jpg|mp4) - reject-200
+^https?:\/\/p\d\.meituan\.net\/(?:(?:bizad|wmbanner)\/\w+\.jpg|movie\/\w+\.jpg\?may_covertWebp) - reject-200
+
+# ===== 闲鱼（备用） =====
+^https?:\/\/acs\.m\.goofish\.com\/gw\/mtop[^/]*splash\.ads - reject-200
+
+# ===== 拼多多（备用） =====
+^https?:\/\/api\.(?:pinduoduo|yangkeduo)\.com\/api\/cappuccino\/splash - reject-200
+
+# ===== 菜鸟（备用） =====
+^https?:\/\/cn-acs\.m\.cainiao\.com\/gw\/mtop\.cainiao\.guoguo\.nbnetflow\.ads\.(?:show|mshow)\.cn\/ - reject-200
+^https?:\/\/iyes\.youku\.com\/uts\/v\d+\/start - reject-200
+
+# ===== 飞猪（备用） =====
+^https:\/\/acs\.m\.taobao\.com\/gw\/mtop\.fliggy\.crm\.screen\.(?:allresource|availablesplashstrategies) - reject-200
+
+# ===== 顺丰（备用） =====
+^https?:\/\/ccsp-egmas\.sf-express\.com\/cx-app-base\/base\/app\/appVersion\/detectionUpgrade - reject-200
+^https:\/\/ccsp-egmas\.sf-express\.com\/cx-app-base\/base\/app\/ad\/queryAdImages - reject-200
+^https?:\/\/shopic\.sf-express\.com\/crm\/mobile\/common\/flashscreen - reject-200
+
+# ===== 喜马拉雅：已实机跑通 =====
+# 启动配置入口
+^https?:\/\/pns\.ximalaya\.com\/pns-portal\/pns\/startUp(?:\/|\?|$).* - reject
+
+# 阻止 linkeye 通过域名或直连 IP 探测 / 跳转
+^https?:\/\/[^\/]+\.ximalaya\.com\/linkeye-cloud\/checkIP(?:\/|\?|$).* - reject
+^https?:\/\/(?:\d{1,3}\.){3}\d{1,3}\/linkeye-cloud\/checkIP(?:\/|\?|$).* - reject
+
+# 开屏推送
+^https?:\/\/(?:live|livewsa)\.ximalaya\.com\/live-data-web\/v1\/app\/push\/screen(?:\/|\?|$).* - reject
+
+# 喜马拉雅自有广告接口
+^https?:\/\/(?:adse(?:\.wsa)?|adbehavior(?:\.wsa)?|adbs|adsebs|xdcs-collector)\.ximalaya\.com\/.* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/api\/v\d+\/adRealTime(?:\/|\?|$).* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/outadservice(?:\/|\?|$).* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/ting\/(?:loading|feed|home|preload)(?:\/|\?|$).* - reject
+
+# 已绕到直连 IP 后的广告接口
+^https?:\/\/(?:\d{1,3}\.){3}\d{1,3}\/api\/v\d+\/adRealTime(?:\/|\?|$).* - reject
+^https?:\/\/(?:\d{1,3}\.){3}\d{1,3}\/(?:outadservice|ting\/(?:loading|feed|home|preload))(?:\/|\?|$).* - reject
+
+# Banner / 推广入口
+^https?:\/\/passport(?:ws)?\.ximalaya\.com\/friendship-mobile\/v1\/findFriendsBanner\/show\/.* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-feed\/focus\/queryF(?:\/|\?|$).* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-feed\/isShowUserGiftPendant(?:\/|\?|$).* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/social-web\/bottomTabs\/dynamicEntrance\/status(?:\/|\?|$).* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/chaos-notice-web\/v1\/message\/preview\/list(?:\/|\?|$).* - reject
+^https?:\/\/[^\/]+\.ximalaya\.com\/mobile-user\/unread(?:\/|\?|$).* - reject
+
+# 仅拦已知广告型 GIF，保留 imagev2 / xmcdn 正常封面与音频
+^https?:\/\/[^\/]+\.xmcdn\.com\/\w{8}\/\w{4}-\w{16}\/.+\.gif(?:\?.*)?$ - reject
+
+[Map Local]
+# 百度网盘：两个接口都要求返回空 JSON，合并为一个原生 Map Local
+^https:\/\/pan\.baidu\.com\/(?:act\/api\/activityentry|buy\/ad\/conf\?.*type=splashMode) data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+
+# 美图秀秀：广告配置返回空 JSON
+^https?:\/\/adui\.tg\.meitu\.com(?:\/|\?|$).* data-type=text data="{}" status-code=200 header="Content-Type:application/json"
+
+[Script]
+# ===== 喜马拉雅：页面 JSON 净化 =====
+🎧 喜马拉雅.分类 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-category\/customCategories(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/permanent-assets/r2-2026-09-03/scripts/ximalaya_json.js, script-update-interval=86400
+🎧 喜马拉雅.轮播 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/focus-mobile\/focusPic(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/permanent-assets/r2-2026-09-03/scripts/ximalaya_json.js, script-update-interval=86400
+🎧 喜马拉雅.推荐 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-feed\/v\d+\/mix(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/permanent-assets/r2-2026-09-03/scripts/ximalaya_json.js, script-update-interval=86400
+🎧 喜马拉雅.分类页 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/discovery-category\/v\d+\/category(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/permanent-assets/r2-2026-09-03/scripts/ximalaya_json.js, script-update-interval=86400
+🎧 喜马拉雅.我的 = type=http-response,pattern=^https?:\/\/[^\/]+\.ximalaya\.com\/mobile-user\/v\d+\/homePage(?:\?.*)?$,requires-body=1,max-size=0,timeout=8,script-path=https://raw.githubusercontent.com/doovvip/sublink-worker2/main/permanent-assets/r2-2026-09-03/scripts/ximalaya_json.js, script-update-interval=86400
+
+[MITM]
+hostname = %APPEND% pan.baidu.com, issuecdn.baidupcs.com, ndstatic.cdn.bcebos.com, staticsns.cdn.bcebos.com, api-sams.walmartmobile.cn, guide-acs.m.taobao.com, api.m.jd.com, bdsp-x.jd.com, dsp-x.jd.com, peisongapi.meituan.com, img.meituan.net, s3plus.meituan.net, flowplus.meituan.net, p*.meituan.net, acs.m.goofish.com, api.pinduoduo.com, api.yangkeduo.com, cn-acs.m.cainiao.com, iyes.youku.com, acs.m.taobao.com, ccsp-egmas.sf-express.com, shopic.sf-express.com, *.ximalaya.com, *.xmcdn.com, 47.100.227.85, 101.89.53.*, 101.91.133.*, 101.91.134.*, 101.91.135.*, update.pan.baidu.com, fc-video.cdn.bcebos.com, rp.hpplay.cn, mea.meitudata.com, adui.tg.meitu.com

@@ -1,0 +1,111 @@
+{
+  "name": "Surge-1.0-R2 permanent assets",
+  "source_candidate": "3608fb40849e929c1977a1f96aeb6351589c9ea0",
+  "own_assets": [
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/youtube.response.maasea.js",
+      "blob": "becad8eaa6094c189ea8db6d644de68ac2d66f61",
+      "source_path": "surge-modules/scripts/youtube.response.maasea.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/youtube.request.maasea.js",
+      "blob": "f0e2a9b9b823f2f289a00446c2876a5097bc6a63",
+      "source_path": "surge-modules/scripts/youtube.request.maasea.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/bilibili.hd-splash.js",
+      "blob": "20066170aea32ab849274d6cc75eb95d2d03fb26",
+      "source_path": "surge-modules/scripts/bilibili.hd-splash.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/bilibili.ads.js",
+      "blob": "1dba3c226bf4191d2323b100b642fcca90489581",
+      "source_path": "surge-modules/scripts/bilibili.ads.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/kkmusic.vip.surge-stable.js",
+      "blob": "727de70888eff32d244dd4c799f727fc8804b5b8",
+      "source_path": "surge-modules/kkmusic.vip.surge-stable.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/ximalaya_json.js",
+      "blob": "6337de836026b9acc3db227a164dadd1ad90315c",
+      "source_path": "surge-modules/scripts/ximalaya_json.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/jd_price.surge.js",
+      "blob": "b76e80051e3ca03be622a41bf4b64ade2293b1b1",
+      "source_path": "surge-modules/scripts/jd_price.surge.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/meitu-frozen.js",
+      "blob": "767f43ecdd16715945c3cf911fe88b8877947982",
+      "source_path": "surge-scripts/meitu-frozen-2026-09-03.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/hongguo-download.js",
+      "blob": "5fee22a66401a7ea434f4a13b12b75ab219cc263",
+      "source_path": "surge-scripts/hongguo-download-frozen-2026-09-03.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/scripts/hongguo-quality.js",
+      "blob": "19cbd4d9cf84a772a4faa6b3af2dc9b645ed146f",
+      "source_path": "surge-scripts/hongguo-quality-frozen-2026-09-03.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/logic/tanzouSubscription.js",
+      "blob": "143a32388ee1ac6ea4bc005daa1a04778783c9bc",
+      "source_path": "src/tanzouSubscription.js"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/logic/api-index.js",
+      "blob": "045434ba01d221c0089ccbc78f5b37be8ccc5427",
+      "source_path": "api/index.js"
+    }
+  ],
+  "third_party_sources": [
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/third-party/Biliverse-Enhanced-v0.5.13/src/response.js",
+      "repo": "Biliverse/Enhanced",
+      "path": "src/response.js",
+      "commit": "6fcb1be0fb6d97e01123da4a3e2fd9a345f49840",
+      "blob": "227bbc4dfb197cd82c1699ea11a0c7d9fb0a793b"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/third-party/Biliverse-Enhanced-v0.5.13/src/function/database.mjs",
+      "repo": "Biliverse/Enhanced",
+      "path": "src/function/database.mjs",
+      "commit": "6fcb1be0fb6d97e01123da4a3e2fd9a345f49840",
+      "blob": "4f9b6350cc41216449efa42acd33eee404f4a7ef"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/third-party/Biliverse-Enhanced-v0.5.13/src/function/setENV.mjs",
+      "repo": "Biliverse/Enhanced",
+      "path": "src/function/setENV.mjs",
+      "commit": "6fcb1be0fb6d97e01123da4a3e2fd9a345f49840",
+      "blob": "3835ccda0922f09767fbce9d7edb4c51b0b06fc8"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/third-party/Biliverse-ADBlock-v0.6.19/src/response.js",
+      "repo": "Biliverse/ADBlock",
+      "path": "src/response.js",
+      "commit": "a86f6042640bbbba3ef7f471e2dba19e06c6238f",
+      "blob": "459890ecb0c01a2fdf297b66ad04a20d1a122123"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/third-party/Biliverse-ADBlock-v0.6.19/src/function/database.mjs",
+      "repo": "Biliverse/ADBlock",
+      "path": "src/function/database.mjs",
+      "commit": "a86f6042640bbbba3ef7f471e2dba19e06c6238f",
+      "blob": "e5f1b33b5c3a15d3e440371fbcaa5606190b4993"
+    },
+    {
+      "archive_path": "permanent-assets/r2-2026-09-03/third-party/Biliverse-ADBlock-v0.6.19/src/function/setENV.mjs",
+      "repo": "Biliverse/ADBlock",
+      "path": "src/function/setENV.mjs",
+      "commit": "a86f6042640bbbba3ef7f471e2dba19e06c6238f",
+      "blob": "16389920358d38f1c24e28fcb137380caf5e6015"
+    }
+  ],
+  "private_runtime": "TanZou node credentials and full private Surge.conf are frozen in Dropbox only, not duplicated into the public repository."
+}

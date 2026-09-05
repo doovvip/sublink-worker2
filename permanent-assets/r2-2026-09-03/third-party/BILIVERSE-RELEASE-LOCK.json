@@ -1,0 +1,28 @@
+{
+  "generated": "2026-09-03",
+  "Enhanced": {
+    "canonical_repo": "Biliverse/Enhanced",
+    "release": "v0.5.13",
+    "release_commit": "6fcb1be0fb6d97e01123da4a3e2fd9a345f49840",
+    "response_asset": {
+      "id": 359260612,
+      "name": "response.bundle.js",
+      "size": 62302,
+      "digest": "sha256:f34238dce8fc4c525a371e934382d2241a6712a366de609892c710712808f445",
+      "url": "https://github.com/Biliverse/Enhanced/releases/download/v0.5.13/response.bundle.js"
+    }
+  },
+  "ADBlock": {
+    "canonical_repo": "Biliverse/ADBlock",
+    "release": "v0.6.19",
+    "release_commit": "a86f6042640bbbba3ef7f471e2dba19e06c6238f",
+    "response_asset": {
+      "id": 250084516,
+      "name": "response.bundle.js",
+      "size": 932734,
+      "digest": null,
+      "url": "https://github.com/Biliverse/ADBlock/releases/download/v0.6.19/response.bundle.js"
+    }
+  },
+  "note": "Official built bundles are GitHub Release assets, not Git-tree files. Their source entry files are archived in this permanent asset set; runtime URLs are pinned to exact releases."
+}

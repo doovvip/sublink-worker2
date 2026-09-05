@@ -1,0 +1,118 @@
+name: Deploy Canary Worker
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - src/**
+      - api/**
+      - surge-modules/**
+      - surge-scripts/**
+      - wrangler.toml
+      - .github/workflows/deploy-canary.yml
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci --no-audit --no-fund
+      - name: Static security gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          files='src/dropboxOAuth.js src/privateSurgeDelivery.js src/worker.jsx'
+          if grep -nE 'SURGE_DELIVERY_KEY|DROPBOX_APP_SECRET|DROPBOX_ACCESS_TOKEN|DROPBOX_REFRESH_TOKEN|privateMaintenanceOnce|migrateStoredDropboxRefreshTokenEncryption' $files; then
+            echo 'Legacy credential coupling remains in production source.'
+            exit 1
+          fi
+          if grep -nE "'/private/(master|Master\.conf|Surge\.conf)'" src/privateSurgeDelivery.js; then
+            echo 'Remote master route remains enabled.'
+            exit 1
+          fi
+          if grep -nE 'handleTanzouSubscription|handleUnifiedSubscription|s-maxage=' api/index.js; then
+            echo 'Legacy Vercel subscription handler/cache returned.'
+            exit 1
+          fi
+          grep -Fq "url.pathname === '/tanzou' || url.pathname === '/all'" api/index.js || {
+            echo 'Vercel /tanzou and /all retirement guard is missing.'
+            exit 1
+          }
+      - name: Server unit tests
+        run: npx vitest run test --exclude 'surge-scripts/**'
+      - name: Build isolated temporary Cloudflare canary config
+        shell: bash
+        run: |
+          cat > wrangler.canary.toml <<'EOF'
+          #:schema node_modules/wrangler/config-schema.json
+          name = "sublink-worker2-canary"
+          main = "src/worker.jsx"
+          compatibility_date = "2024-07-24"
+          compatibility_flags = ["nodejs_compat"]
+          workers_dev = true
+          EOF
+      - name: Deploy isolated temporary canary
+        shell: bash
+        run: |
+          set -euo pipefail
+          npx wrangler deploy --temporary --config wrangler.canary.toml 2>&1 | tee deploy.log
+          sed -r 's/\x1B\[[0-9;]*[mK]//g' deploy.log > deploy.clean.log
+          CANARY_URL="$(grep -Eo 'https://[A-Za-z0-9.-]+\.workers\.dev' deploy.clean.log | tail -1)"
+          test -n "$CANARY_URL"
+          echo "CANARY_URL=$CANARY_URL" >> "$GITHUB_ENV"
+      - name: Smoke test hardened Worker routes with propagation retries
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          probe() {
+            name="$1"
+            url="$2"
+            expected="$3"
+            file="/tmp/${name}.out"
+            code=""
+            for i in $(seq 1 18); do
+              code="$(curl -sS -o "$file" -w '%{http_code}' "$url" || true)"
+              echo "$name attempt $i: HTTP $code"
+              if [ "$code" = "$expected" ]; then
+                return 0
+              fi
+              sleep 5
+            done
+            echo "$name did not reach expected HTTP $expected; last response (first 400 chars):"
+            head -c 400 "$file" 2>/dev/null || true
+            echo
+            return 1
+          }
+
+          probe health "$CANARY_URL/health" 200
+          test "$(cat /tmp/health.out)" = "OK"
+
+          probe modules "$CANARY_URL/surge-modules" 200
+          grep -q '7 个独立模块' /tmp/modules.out
+          grep -q '美图秀秀' /tmp/modules.out
+          grep -q '红果短剧' /tmp/modules.out
+
+          probe full "$CANARY_URL/surge-module?modules=youtube,jd,startup,bili,kuwo,meitu,hongguo" 200
+          grep -q '^#!name = ⚡ Surge 正式母版合集' /tmp/full.out
+          grep -q '美图秀秀' /tmp/full.out
+          grep -q '红果短剧' /tmp/full.out
+          grep -q '^\[Script\]' /tmp/full.out
+          grep -q '^\[MITM\]' /tmp/full.out
+
+          probe surge_nodes "$CANARY_URL/surge-nodes" 404
+          probe oauth "$CANARY_URL/dropbox-oauth" 404
+          probe maintenance "$CANARY_URL/private/_maintenance-once" 404
+          probe private_master "$CANARY_URL/private/master" 404
+          probe private_r2 "$CANARY_URL/private/R2.conf" 404
+          probe tanzou "$CANARY_URL/tanzou" 404
+          probe all "$CANARY_URL/all" 404
